@@ -1,49 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ThumbsDown, ThumbsUp, MapPin, Waves, Clock } from "lucide-react";
 
-const sampleDivers = [
-  {
-    id: 1,
-    name: "Maya",
-    location: "Bali, Indonesia",
-    level: "Advanced Open Water",
-    experience: 120,
-    bio: "Macro lover. Sunrise dives are my happy place.",
-    image:
-      "https://images.unsplash.com/photo-1534274988757-a28bf1a57c17?q=80&w=1740&auto=format&fit=crop",
-  },
-  {
-    id: 2,
-    name: "Leo",
-    location: "Cozumel, Mexico",
-    level: "Rescue Diver",
-    experience: 210,
-    bio: "Drift diving addict. Photographer on the side.",
-    image:
-      "https://images.unsplash.com/photo-1544551763-7ef420be2e25?q=80&w=1740&auto=format&fit=crop",
-  },
-  {
-    id: 3,
-    name: "Aya",
-    location: "Okinawa, Japan",
-    level: "Advanced Open Water",
-    experience: 85,
-    bio: "Sea turtles and calm seas, please.",
-    image:
-      "https://images.unsplash.com/photo-1544273677-c433136021f5?q=80&w=1740&auto=format&fit=crop",
-  },
-  {
-    id: 4,
-    name: "Sam",
-    location: "Red Sea, Egypt",
-    level: "Divemaster",
-    experience: 350,
-    bio: "Wrecks and night dives. I bring cookies for the surface interval.",
-    image:
-      "https://images.unsplash.com/photo-1542027951431-81b38a08719c?q=80&w=1740&auto=format&fit=crop",
-  },
-];
-
 function useDraggable(onSwipe) {
   const ref = useRef(null);
   const [drag, setDrag] = useState({ x: 0, y: 0, active: false });
@@ -102,6 +59,9 @@ function DiverCard({ diver, onSwipeLeft, onSwipeRight, isTop }) {
 
   const { ref, style } = useDraggable(onSwipe);
 
+  const photo = diver?.image ||
+    "https://images.unsplash.com/photo-1526336024174-e58f5cdd8e13?q=80&w=1600&auto=format&fit=crop";
+
   return (
     <div
       ref={isTop ? ref : null}
@@ -111,17 +71,17 @@ function DiverCard({ diver, onSwipeLeft, onSwipeRight, isTop }) {
       <div className="h-full w-full rounded-3xl overflow-hidden shadow-xl border border-white/20 bg-white">
         <div className="relative h-3/5 w-full">
           <img
-            src={diver.image}
-            alt={diver.name}
+            src={photo}
+            alt={diver?.name || "Diver"}
             className="h-full w-full object-cover"
             draggable={false}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
           <div className="absolute bottom-3 left-4 right-4 text-white drop-shadow">
-            <h3 className="text-2xl font-semibold">{diver.name}</h3>
+            <h3 className="text-2xl font-semibold">{diver?.name || "Diver"}</h3>
             <div className="mt-1 flex items-center gap-2 text-sm text-white/90">
               <MapPin size={16} />
-              <span>{diver.location}</span>
+              <span>{diver?.location || "Somewhere by the sea"}</span>
             </div>
           </div>
         </div>
@@ -130,15 +90,15 @@ function DiverCard({ diver, onSwipeLeft, onSwipeRight, isTop }) {
           <div className="flex items-center gap-3 text-sm text-gray-600">
             <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-cyan-50 text-cyan-700 border border-cyan-200">
               <Waves size={16} />
-              {diver.level}
+              {diver?.level || "Open Water"}
             </span>
             <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
               <Clock size={16} />
-              {diver.experience} dives
+              {diver?.experience ?? 0} dives
             </span>
           </div>
           <p className="mt-3 text-gray-700 leading-relaxed">
-            {diver.bio}
+            {diver?.bio || "Ocean lover excited to explore new sites and make friends underwater."}
           </p>
         </div>
       </div>
@@ -146,26 +106,35 @@ function DiverCard({ diver, onSwipeLeft, onSwipeRight, isTop }) {
   );
 }
 
-export default function CardStack() {
-  const [cards, setCards] = useState(sampleDivers);
-  const topCard = useMemo(() => cards[cards.length - 1], [cards]);
+export default function CardStack({ divers = [], loading = false, onSwipeLeft, onSwipeRight }) {
+  const top = divers[0];
 
   const swipeLeft = () => {
-    setCards((prev) => prev.slice(0, -1));
+    if (top) onSwipeLeft?.(top);
   };
   const swipeRight = () => {
-    setCards((prev) => prev.slice(0, -1));
+    if (top) onSwipeRight?.(top);
   };
 
   return (
     <div className="relative aspect-[3/4] w-full max-w-md mx-auto">
-      {cards.map((diver, idx) => {
-        const isTop = idx === cards.length - 1;
+      {loading && (
+        <div className="absolute inset-0 grid place-items-center">
+          <div className="animate-pulse text-gray-500">Loading divers…</div>
+        </div>
+      )}
+
+      {divers.map((diver, idx) => {
+        const isTop = idx === 0;
+        const depth = Math.max(0, Math.min(3, idx));
         return (
           <div
-            key={diver.id}
+            key={diver._id || diver.id || idx}
             className="absolute inset-0"
-            style={{ transform: `translateY(-${(cards.length - 1 - idx) * 8}px) scale(${1 - (cards.length - 1 - idx) * 0.03})`, filter: `blur(${Math.max(0, cards.length - 1 - idx - 2)}px)` }}
+            style={{
+              transform: `translateY(${depth * -8}px) scale(${1 - depth * 0.03})`,
+              filter: `blur(${Math.max(0, depth - 2)}px)`,
+            }}
           >
             <DiverCard
               diver={diver}
@@ -177,7 +146,7 @@ export default function CardStack() {
         );
       })}
 
-      {topCard ? (
+      {top ? (
         <div className="absolute -bottom-16 left-0 right-0 flex items-center justify-center gap-6">
           <button
             onClick={swipeLeft}
