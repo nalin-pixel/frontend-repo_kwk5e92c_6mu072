@@ -1,28 +1,47 @@
-import { useState } from 'react'
+import Header from "./components/Header";
+import CardStack from "./components/CardStack";
+import FiltersBar from "./components/FiltersBar";
+import Onboarding from "./components/Onboarding";
 
-function App() {
-  const [count, setCount] = useState(0)
-
+function Background() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">
-          Vibe Coding Platform
-        </h1>
-        <p className="text-gray-600 mb-6">
-          Your AI-powered development environment
-        </p>
-        <div className="text-center">
-          <button
-            onClick={() => setCount(count + 1)}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
-          >
-            Count is {count}
-          </button>
-        </div>
-      </div>
+    <div className="absolute inset-0 -z-0 pointer-events-none">
+      <div className="absolute inset-0 bg-gradient-to-b from-cyan-50 to-white" />
+      <div className="absolute -top-40 left-1/2 -translate-x-1/2 h-80 w-[40rem] rounded-full bg-cyan-200/40 blur-3xl" />
     </div>
-  )
+  );
 }
 
-export default App
+export default function App() {
+  return (
+    <div className="min-h-screen relative text-gray-900">
+      <Background />
+      <Header />
+
+      <main className="mx-auto max-w-5xl px-4 sm:px-6">
+        <section className="pt-8 sm:pt-12 text-center">
+          <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">
+            Find your perfect dive buddy
+          </h1>
+          <p className="mt-2 text-gray-600">
+            Swipe to match with divers who share your vibe, level, and location.
+          </p>
+        </section>
+
+        <FiltersBar onChange={() => {}} />
+
+        <section className="mt-10 sm:mt-14">
+          <CardStack />
+        </section>
+
+        <section className="mt-28 sm:mt-32 mb-20">
+          <Onboarding />
+        </section>
+      </main>
+
+      <footer className="mt-10 py-8 text-center text-sm text-gray-500">
+        Built with love for the ocean. Stay safe and respect marine life.
+      </footer>
+    </div>
+  );
+}
